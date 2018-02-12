@@ -98,11 +98,11 @@ public final class Team {
         return mDescription;
     }
 
-    public boolean isCompleted() {
+    public boolean isChampion() {
         return mChampion;
     }
 
-    public boolean isActive() {
+    public boolean isNormal() {
         return !mChampion;
     }
 

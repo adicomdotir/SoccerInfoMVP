@@ -33,6 +33,6 @@ public final class TeamsPersistenceContract {
         public static final String COLUMN_NAME_ENTRY_ID = "entryid";
         public static final String COLUMN_NAME_TITLE = "title";
         public static final String COLUMN_NAME_DESCRIPTION = "description";
-        public static final String COLUMN_NAME_COMPLETED = "completed";
+        public static final String COLUMN_NAME_CHAMPION = "champion";
     }
 }

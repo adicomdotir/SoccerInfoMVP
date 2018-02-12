@@ -120,31 +120,31 @@ public class TeamsRepository implements TeamsDataSource {
     }
 
     @Override
-    public void completeTeam(@NonNull Team team) {
+    public void championTeam(@NonNull Team team) {
         checkNotNull(team);
-        mTeamsRemoteDataSource.completeTeam(team);
-        mTeamsLocalDataSource.completeTeam(team);
+        mTeamsRemoteDataSource.championTeam(team);
+        mTeamsLocalDataSource.championTeam(team);
 
-        Team completedTeam = new Team(team.getTitle(), team.getDescription(), team.getId(), true);
+        Team championdTeam = new Team(team.getTitle(), team.getDescription(), team.getId(), true);
 
         // Do in memory cache update to keep the app UI up to date
         if (mCachedTeams == null) {
             mCachedTeams = new LinkedHashMap<>();
         }
-        mCachedTeams.put(team.getId(), completedTeam);
+        mCachedTeams.put(team.getId(), championdTeam);
     }
 
     @Override
-    public void completeTeam(@NonNull String teamId) {
+    public void championTeam(@NonNull String teamId) {
         checkNotNull(teamId);
-        completeTeam(getTeamWithId(teamId));
+        championTeam(getTeamWithId(teamId));
     }
 
     @Override
-    public void activateTeam(@NonNull Team team) {
+    public void normalTeam(@NonNull Team team) {
         checkNotNull(team);
-        mTeamsRemoteDataSource.activateTeam(team);
-        mTeamsLocalDataSource.activateTeam(team);
+        mTeamsRemoteDataSource.normalTeam(team);
+        mTeamsLocalDataSource.normalTeam(team);
 
         Team activeTeam = new Team(team.getTitle(), team.getDescription(), team.getId());
 
@@ -156,9 +156,9 @@ public class TeamsRepository implements TeamsDataSource {
     }
 
     @Override
-    public void activateTeam(@NonNull String teamId) {
+    public void normalTeam(@NonNull String teamId) {
         checkNotNull(teamId);
-        activateTeam(getTeamWithId(teamId));
+        normalTeam(getTeamWithId(teamId));
     }
 
     @Override

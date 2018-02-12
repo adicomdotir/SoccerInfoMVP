@@ -50,7 +50,7 @@ public class TeamsLocalDataSource implements TeamsDataSource {
                 TeamsPersistenceContract.TeamEntry.COLUMN_NAME_ENTRY_ID,
                 TeamsPersistenceContract.TeamEntry.COLUMN_NAME_TITLE,
                 TeamsPersistenceContract.TeamEntry.COLUMN_NAME_DESCRIPTION,
-                TeamsPersistenceContract.TeamEntry.COLUMN_NAME_COMPLETED
+                TeamsPersistenceContract.TeamEntry.COLUMN_NAME_CHAMPION
         };
 
         Cursor c = db.query(
@@ -62,9 +62,9 @@ public class TeamsLocalDataSource implements TeamsDataSource {
                 String title = c.getString(c.getColumnIndexOrThrow(TeamsPersistenceContract.TeamEntry.COLUMN_NAME_TITLE));
                 String description =
                         c.getString(c.getColumnIndexOrThrow(TeamsPersistenceContract.TeamEntry.COLUMN_NAME_DESCRIPTION));
-                boolean completed =
-                        c.getInt(c.getColumnIndexOrThrow(TeamsPersistenceContract.TeamEntry.COLUMN_NAME_COMPLETED)) == 1;
-                Team team = new Team(title, description, itemId, completed);
+                boolean champion =
+                        c.getInt(c.getColumnIndexOrThrow(TeamsPersistenceContract.TeamEntry.COLUMN_NAME_CHAMPION)) == 1;
+                Team team = new Team(title, description, itemId, champion);
                 teams.add(team);
             }
         }
@@ -95,7 +95,7 @@ public class TeamsLocalDataSource implements TeamsDataSource {
                 TeamsPersistenceContract.TeamEntry.COLUMN_NAME_ENTRY_ID,
                 TeamsPersistenceContract.TeamEntry.COLUMN_NAME_TITLE,
                 TeamsPersistenceContract.TeamEntry.COLUMN_NAME_DESCRIPTION,
-                TeamsPersistenceContract.TeamEntry.COLUMN_NAME_COMPLETED
+                TeamsPersistenceContract.TeamEntry.COLUMN_NAME_CHAMPION
         };
 
         String selection = TeamsPersistenceContract.TeamEntry.COLUMN_NAME_ENTRY_ID + " LIKE ?";
@@ -112,9 +112,9 @@ public class TeamsLocalDataSource implements TeamsDataSource {
             String title = c.getString(c.getColumnIndexOrThrow(TeamsPersistenceContract.TeamEntry.COLUMN_NAME_TITLE));
             String description =
                     c.getString(c.getColumnIndexOrThrow(TeamsPersistenceContract.TeamEntry.COLUMN_NAME_DESCRIPTION));
-            boolean completed =
-                    c.getInt(c.getColumnIndexOrThrow(TeamsPersistenceContract.TeamEntry.COLUMN_NAME_COMPLETED)) == 1;
-            team = new Team(title, description, itemId, completed);
+            boolean champion =
+                    c.getInt(c.getColumnIndexOrThrow(TeamsPersistenceContract.TeamEntry.COLUMN_NAME_CHAMPION)) == 1;
+            team = new Team(title, description, itemId, champion);
         }
         if (c != null) {
             c.close();
@@ -138,7 +138,7 @@ public class TeamsLocalDataSource implements TeamsDataSource {
         values.put(TeamsPersistenceContract.TeamEntry.COLUMN_NAME_ENTRY_ID, team.getId());
         values.put(TeamsPersistenceContract.TeamEntry.COLUMN_NAME_TITLE, team.getTitle());
         values.put(TeamsPersistenceContract.TeamEntry.COLUMN_NAME_DESCRIPTION, team.getDescription());
-        values.put(TeamsPersistenceContract.TeamEntry.COLUMN_NAME_COMPLETED, team.isCompleted());
+        values.put(TeamsPersistenceContract.TeamEntry.COLUMN_NAME_CHAMPION, team.isChampion());
 
         db.insert(TeamsPersistenceContract.TeamEntry.TABLE_NAME, null, values);
 
@@ -146,11 +146,11 @@ public class TeamsLocalDataSource implements TeamsDataSource {
     }
 
     @Override
-    public void completeTeam(@NonNull Team team) {
+    public void championTeam(@NonNull Team team) {
         SQLiteDatabase db = mDbHelper.getWritableDatabase();
 
         ContentValues values = new ContentValues();
-        values.put(TeamsPersistenceContract.TeamEntry.COLUMN_NAME_COMPLETED, true);
+        values.put(TeamsPersistenceContract.TeamEntry.COLUMN_NAME_CHAMPION, true);
 
         String selection = TeamsPersistenceContract.TeamEntry.COLUMN_NAME_ENTRY_ID + " LIKE ?";
         String[] selectionArgs = { team.getId() };
@@ -161,17 +161,17 @@ public class TeamsLocalDataSource implements TeamsDataSource {
     }
 
     @Override
-    public void completeTeam(@NonNull String teamId) {
+    public void championTeam(@NonNull String teamId) {
         // Not required for the local data source because the {@link TeamsRepository} handles
         // converting from a {@code teamId} to a {@link team} using its cached data.
     }
 
     @Override
-    public void activateTeam(@NonNull Team team) {
+    public void normalTeam(@NonNull Team team) {
         SQLiteDatabase db = mDbHelper.getWritableDatabase();
 
         ContentValues values = new ContentValues();
-        values.put(TeamsPersistenceContract.TeamEntry.COLUMN_NAME_COMPLETED, false);
+        values.put(TeamsPersistenceContract.TeamEntry.COLUMN_NAME_CHAMPION, false);
 
         String selection = TeamsPersistenceContract.TeamEntry.COLUMN_NAME_ENTRY_ID + " LIKE ?";
         String[] selectionArgs = { team.getId() };
@@ -182,16 +182,16 @@ public class TeamsLocalDataSource implements TeamsDataSource {
     }
 
     @Override
-    public void activateTeam(@NonNull String teamId) {
+    public void normalTeam(@NonNull String teamId) {
         // Not required for the local data source because the {@link TeamsRepository} handles
         // converting from a {@code teamId} to a {@link team} using its cached data.
     }
 
     @Override
-    public void clearCompletedTeams() {
+    public void clearChampionTeams() {
         SQLiteDatabase db = mDbHelper.getWritableDatabase();
 
-        String selection = TeamsPersistenceContract.TeamEntry.COLUMN_NAME_COMPLETED + " LIKE ?";
+        String selection = TeamsPersistenceContract.TeamEntry.COLUMN_NAME_CHAMPION + " LIKE ?";
         String[] selectionArgs = { "1" };
 
         db.delete(TeamsPersistenceContract.TeamEntry.TABLE_NAME, selection, selectionArgs);

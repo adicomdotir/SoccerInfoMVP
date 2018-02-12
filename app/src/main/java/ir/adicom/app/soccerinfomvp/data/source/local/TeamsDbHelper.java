@@ -20,7 +20,7 @@ public class TeamsDbHelper extends SQLiteOpenHelper {
                     TeamsPersistenceContract.TeamEntry.COLUMN_NAME_ENTRY_ID + TEXT_TYPE + " PRIMARY KEY," +
                     TeamsPersistenceContract.TeamEntry.COLUMN_NAME_TITLE + TEXT_TYPE + COMMA_SEP +
                     TeamsPersistenceContract.TeamEntry.COLUMN_NAME_DESCRIPTION + TEXT_TYPE + COMMA_SEP +
-                    TeamsPersistenceContract.TeamEntry.COLUMN_NAME_COMPLETED + BOOLEAN_TYPE +
+                    TeamsPersistenceContract.TeamEntry.COLUMN_NAME_CHAMPION + BOOLEAN_TYPE +
             " )";
 
     public TeamsDbHelper(Context context) {

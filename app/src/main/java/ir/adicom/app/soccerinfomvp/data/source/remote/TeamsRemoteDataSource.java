@@ -21,10 +21,10 @@ public class TeamsRemoteDataSource implements TeamsDataSource {
 
     private static final int SERVICE_LATENCY_IN_MILLIS = 5000;
 
-    private final static Map<String, Team> TASKS_SERVICE_DATA;
+    private final static Map<String, Team> TEAMS_SERVICE_DATA;
 
     static {
-        TASKS_SERVICE_DATA = new LinkedHashMap<>(2);
+        TEAMS_SERVICE_DATA = new LinkedHashMap<>(2);
         addTeam("Build tower in Pisa", "Ground looks good, no foundation work required.");
         addTeam("Finish bridge in Tacoma", "Found awesome girders at half the cost!");
     }
@@ -41,7 +41,7 @@ public class TeamsRemoteDataSource implements TeamsDataSource {
 
     private static void addTeam(String title, String description) {
         Team newTeam = new Team(title, description);
-        TASKS_SERVICE_DATA.put(newTeam.getId(), newTeam);
+        TEAMS_SERVICE_DATA.put(newTeam.getId(), newTeam);
     }
 
     /**
@@ -56,7 +56,7 @@ public class TeamsRemoteDataSource implements TeamsDataSource {
         handler.postDelayed(new Runnable() {
             @Override
             public void run() {
-                callback.onTeamsLoaded(Lists.newArrayList(TASKS_SERVICE_DATA.values()));
+                callback.onTeamsLoaded(Lists.newArrayList(TEAMS_SERVICE_DATA.values()));
             }
         }, SERVICE_LATENCY_IN_MILLIS);
     }
@@ -68,7 +68,7 @@ public class TeamsRemoteDataSource implements TeamsDataSource {
      */
     @Override
     public void getTeam(@NonNull String teamId, final @NonNull GetTeamCallback callback) {
-        final Team team = TASKS_SERVICE_DATA.get(teamId);
+        final Team team = TEAMS_SERVICE_DATA.get(teamId);
 
         // Simulate network by delaying the execution.
         Handler handler = new Handler();
@@ -82,39 +82,39 @@ public class TeamsRemoteDataSource implements TeamsDataSource {
 
     @Override
     public void saveTeam(@NonNull Team team) {
-        TASKS_SERVICE_DATA.put(team.getId(), team);
+        TEAMS_SERVICE_DATA.put(team.getId(), team);
     }
 
     @Override
-    public void completeTeam(@NonNull Team team) {
+    public void championTeam(@NonNull Team team) {
         Team completedTeam = new Team(team.getTitle(), team.getDescription(), team.getId(), true);
-        TASKS_SERVICE_DATA.put(team.getId(), completedTeam);
+        TEAMS_SERVICE_DATA.put(team.getId(), completedTeam);
     }
 
     @Override
-    public void completeTeam(@NonNull String teamId) {
+    public void championTeam(@NonNull String teamId) {
         // Not required for the remote data source because the {@link TeamsRepository} handles
         // converting from a {@code teamId} to a {@link team} using its cached data.
     }
 
     @Override
-    public void activateTeam(@NonNull Team team) {
+    public void normalTeam(@NonNull Team team) {
         Team activeTeam = new Team(team.getTitle(), team.getDescription(), team.getId());
-        TASKS_SERVICE_DATA.put(team.getId(), activeTeam);
+        TEAMS_SERVICE_DATA.put(team.getId(), activeTeam);
     }
 
     @Override
-    public void activateTeam(@NonNull String teamId) {
+    public void normalTeam(@NonNull String teamId) {
         // Not required for the remote data source because the {@link TeamsRepository} handles
         // converting from a {@code teamId} to a {@link team} using its cached data.
     }
 
     @Override
-    public void clearCompletedTeams() {
-        Iterator<Map.Entry<String, Team>> it = TASKS_SERVICE_DATA.entrySet().iterator();
+    public void clearChampionTeams() {
+        Iterator<Map.Entry<String, Team>> it = TEAMS_SERVICE_DATA.entrySet().iterator();
         while (it.hasNext()) {
             Map.Entry<String, Team> entry = it.next();
-            if (entry.getValue().isCompleted()) {
+            if (entry.getValue().isChampion()) {
                 it.remove();
             }
         }
@@ -128,11 +128,11 @@ public class TeamsRemoteDataSource implements TeamsDataSource {
 
     @Override
     public void deleteAllTeams() {
-        TASKS_SERVICE_DATA.clear();
+        TEAMS_SERVICE_DATA.clear();
     }
 
     @Override
     public void deleteTeam(@NonNull String teamId) {
-        TASKS_SERVICE_DATA.remove(teamId);
+        TEAMS_SERVICE_DATA.remove(teamId);
     }
 }

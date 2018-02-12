@@ -36,15 +36,15 @@ public interface TeamsDataSource {
 
     void saveTeam(@NonNull Team team);
 
-    void completeTeam(@NonNull Team team);
+    void championTeam(@NonNull Team team);
 
-    void completeTeam(@NonNull String teamId);
+    void championTeam(@NonNull String teamId);
 
-    void activateTeam(@NonNull Team team);
+    void normalTeam(@NonNull Team team);
 
-    void activateTeam(@NonNull String teamId);
+    void normalTeam(@NonNull String teamId);
 
-    void clearCompletedTeams();
+    void clearChampionTeams();
 
     void refreshTeams();
 
