@@ -13,6 +13,8 @@ import android.view.MenuItem;
 
 import ir.adicom.app.soccerinfomvp.R;
 import ir.adicom.app.soccerinfomvp.data.source.TeamsRepository;
+import ir.adicom.app.soccerinfomvp.data.source.local.TeamsLocalDataSource;
+import ir.adicom.app.soccerinfomvp.data.source.remote.TeamsRemoteDataSource;
 import ir.adicom.app.soccerinfomvp.util.ActivityUtils;
 
 public class TeamsActivity extends AppCompatActivity {
@@ -52,11 +54,11 @@ public class TeamsActivity extends AppCompatActivity {
                     getSupportFragmentManager(), teamsFragment, R.id.contentFrame);
         }
 
-        TeamsRepository.getInstance(FakeTasksRemoteDataSource.getInstance(),
-                TasksLocalDataSource.getInstance(context));
+
         // Create the presenter
         mTeamPresenter = new TeamsPresenter(
-                Injection.provideTeamRepository(getApplicationContext()), teamsFragment);
+                TeamsRepository.getInstance(TeamsRemoteDataSource.getInstance(),
+                        TeamsLocalDataSource.getInstance(getApplicationContext())), teamsFragment);
 
         // Load previously saved state, if available.
         if (savedInstanceState != null) {

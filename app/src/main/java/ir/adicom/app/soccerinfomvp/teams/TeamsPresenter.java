@@ -1,32 +1,14 @@
-/*
- * Copyright 2016, The Android Open Source Project
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 package ir.adicom.app.soccerinfomvp.teams;
 
 import android.app.Activity;
 import android.support.annotation.NonNull;
 
-import com.example.android.architecture.blueprints.todoapp.addedittask.AddEditTaskActivity;
-import com.example.android.architecture.blueprints.todoapp.data.Task;
-import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource;
-import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository;
-import com.example.android.architecture.blueprints.todoapp.util.EspressoIdlingResource;
-
 import java.util.ArrayList;
 import java.util.List;
+
+import ir.adicom.app.soccerinfomvp.data.Team;
+import ir.adicom.app.soccerinfomvp.data.source.TeamsDataSource;
+import ir.adicom.app.soccerinfomvp.data.source.TeamsRepository;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -36,119 +18,119 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 public class TeamsPresenter implements TeamsContract.Presenter {
 
-    private final TasksRepository mTasksRepository;
+    private final TeamsRepository mTeamsRepository;
 
-    private final TeamsContract.View mTasksView;
+    private final TeamsContract.View mTeamsView;
 
-    private TeamsFilterType mCurrentFiltering = TeamsFilterType.ALL_TASKS;
+    private TeamsFilterType mCurrentFiltering = TeamsFilterType.ALL_TEAMS;
 
     private boolean mFirstLoad = true;
 
-    public TeamsPresenter(@NonNull TasksRepository tasksRepository, @NonNull TeamsContract.View tasksView) {
-        mTasksRepository = checkNotNull(tasksRepository, "tasksRepository cannot be null");
-        mTasksView = checkNotNull(tasksView, "tasksView cannot be null!");
+    public TeamsPresenter(@NonNull TeamsRepository teamsRepository, @NonNull TeamsContract.View teamsView) {
+        mTeamsRepository = checkNotNull(teamsRepository, "teamsRepository cannot be null");
+        mTeamsView = checkNotNull(teamsView, "teamsView cannot be null!");
 
-        mTasksView.setPresenter(this);
+        mTeamsView.setPresenter(this);
     }
 
     @Override
     public void start() {
-        loadTasks(false);
+        loadTeams(false);
     }
 
     @Override
     public void result(int requestCode, int resultCode) {
         // If a task was successfully added, show snackbar
-        if (AddEditTaskActivity.REQUEST_ADD_TASK == requestCode && Activity.RESULT_OK == resultCode) {
-            mTasksView.showSuccessfullySavedMessage();
-        }
+//        if (AddEditTeamActivity.REQUEST_ADD_TASK == requestCode && Activity.RESULT_OK == resultCode) {
+//            mTeamsView.showSuccessfullySavedMessage();
+//        }
     }
 
     @Override
-    public void loadTasks(boolean forceUpdate) {
+    public void loadTeams(boolean forceUpdate) {
         // Simplification for sample: a network reload will be forced on first load.
-        loadTasks(forceUpdate || mFirstLoad, true);
+        loadTeams(forceUpdate || mFirstLoad, true);
         mFirstLoad = false;
     }
 
     /**
-     * @param forceUpdate   Pass in true to refresh the data in the {@link TasksDataSource}
+     * @param forceUpdate   Pass in true to refresh the data in the {@link TeamsDataSource}
      * @param showLoadingUI Pass in true to display a loading icon in the UI
      */
-    private void loadTasks(boolean forceUpdate, final boolean showLoadingUI) {
+    private void loadTeams(boolean forceUpdate, final boolean showLoadingUI) {
         if (showLoadingUI) {
-            mTasksView.setLoadingIndicator(true);
+            mTeamsView.setLoadingIndicator(true);
         }
         if (forceUpdate) {
-            mTasksRepository.refreshTasks();
+            mTeamsRepository.refreshTeams();
         }
 
         // The network request might be handled in a different thread so make sure Espresso knows
         // that the app is busy until the response is handled.
-        EspressoIdlingResource.increment(); // App is busy until further notice
+        // EspressoIdlingResource.increment(); // App is busy until further notice
 
-        mTasksRepository.getTasks(new TasksDataSource.LoadTasksCallback() {
+        mTeamsRepository.getTeams(new TeamsDataSource.LoadTeamsCallback() {
             @Override
-            public void onTasksLoaded(List<Task> tasks) {
-                List<Task> tasksToShow = new ArrayList<Task>();
+            public void onTeamsLoaded(List<Team> teams) {
+                List<Team> teamsToShow = new ArrayList<Team>();
 
                 // This callback may be called twice, once for the cache and once for loading
                 // the data from the server API, so we check before decrementing, otherwise
                 // it throws "Counter has been corrupted!" exception.
-                if (!EspressoIdlingResource.getIdlingResource().isIdleNow()) {
-                    EspressoIdlingResource.decrement(); // Set app as idle.
-                }
+//                if (!EspressoIdlingResource.getIdlingResource().isIdleNow()) {
+//                    EspressoIdlingResource.decrement(); // Set app as idle.
+//                }
 
-                // We filter the tasks based on the requestType
-                for (Task task : tasks) {
+                // We filter the teams based on the requestType
+                for (Team task : teams) {
                     switch (mCurrentFiltering) {
-                        case ALL_TASKS:
-                            tasksToShow.add(task);
+                        case ALL_TEAMS:
+                            teamsToShow.add(task);
                             break;
-                        case ACTIVE_TASKS:
-                            if (task.isActive()) {
-                                tasksToShow.add(task);
+                        case NORMAL_TEAMS:
+                            if (task.isNormal()) {
+                                teamsToShow.add(task);
                             }
                             break;
-                        case COMPLETED_TASKS:
-                            if (task.isCompleted()) {
-                                tasksToShow.add(task);
+                        case TOP_TEAMS:
+                            if (task.isChampion()) {
+                                teamsToShow.add(task);
                             }
                             break;
                         default:
-                            tasksToShow.add(task);
+                            teamsToShow.add(task);
                             break;
                     }
                 }
                 // The view may not be able to handle UI updates anymore
-                if (!mTasksView.isActive()) {
+                if (!mTeamsView.isActive()) {
                     return;
                 }
                 if (showLoadingUI) {
-                    mTasksView.setLoadingIndicator(false);
+                    mTeamsView.setLoadingIndicator(false);
                 }
 
-                processTasks(tasksToShow);
+                processTeams(teamsToShow);
             }
 
             @Override
             public void onDataNotAvailable() {
                 // The view may not be able to handle UI updates anymore
-                if (!mTasksView.isActive()) {
+                if (!mTeamsView.isActive()) {
                     return;
                 }
-                mTasksView.showLoadingTasksError();
+                mTeamsView.showLoadingTeamsError();
             }
         });
     }
 
-    private void processTasks(List<Task> tasks) {
-        if (tasks.isEmpty()) {
-            // Show a message indicating there are no tasks for that filter type.
-            processEmptyTasks();
+    private void processTeams(List<Team> teams) {
+        if (teams.isEmpty()) {
+            // Show a message indicating there are no teams for that filter type.
+            processEmptyTeams();
         } else {
-            // Show the list of tasks
-            mTasksView.showTasks(tasks);
+            // Show the list of teams
+            mTeamsView.showTeams(teams);
             // Set the filter label's text.
             showFilterLabel();
         }
@@ -156,64 +138,64 @@ public class TeamsPresenter implements TeamsContract.Presenter {
 
     private void showFilterLabel() {
         switch (mCurrentFiltering) {
-            case ACTIVE_TASKS:
-                mTasksView.showActiveFilterLabel();
+            case NORMAL_TEAMS:
+                mTeamsView.showActiveFilterLabel();
                 break;
-            case COMPLETED_TASKS:
-                mTasksView.showCompletedFilterLabel();
+            case TOP_TEAMS:
+                mTeamsView.showCompletedFilterLabel();
                 break;
             default:
-                mTasksView.showAllFilterLabel();
+                mTeamsView.showAllFilterLabel();
                 break;
         }
     }
 
-    private void processEmptyTasks() {
+    private void processEmptyTeams() {
         switch (mCurrentFiltering) {
-            case ACTIVE_TASKS:
-                mTasksView.showNoActiveTasks();
+            case NORMAL_TEAMS:
+                mTeamsView.showNoActiveTeams();
                 break;
-            case COMPLETED_TASKS:
-                mTasksView.showNoCompletedTasks();
+            case TOP_TEAMS:
+                mTeamsView.showNoCompletedTeams();
                 break;
             default:
-                mTasksView.showNoTasks();
+                mTeamsView.showNoTeams();
                 break;
         }
     }
 
     @Override
-    public void addNewTask() {
-        mTasksView.showAddTask();
+    public void addNewTeam() {
+        mTeamsView.showAddTeam();
     }
 
     @Override
-    public void openTaskDetails(@NonNull Task requestedTask) {
-        checkNotNull(requestedTask, "requestedTask cannot be null!");
-        mTasksView.showTaskDetailsUi(requestedTask.getId());
+    public void openTeamDetails(@NonNull Team requestedTeam) {
+        checkNotNull(requestedTeam, "requestedTeam cannot be null!");
+        mTeamsView.showTeamDetailsUi(requestedTeam.getId());
     }
 
     @Override
-    public void completeTask(@NonNull Task completedTask) {
-        checkNotNull(completedTask, "completedTask cannot be null!");
-        mTasksRepository.completeTask(completedTask);
-        mTasksView.showTaskMarkedComplete();
-        loadTasks(false, false);
+    public void championTeam(@NonNull Team championdTeam) {
+        checkNotNull(championdTeam, "championdTeam cannot be null!");
+        mTeamsRepository.championTeam(championdTeam);
+        mTeamsView.showTeamMarkedComplete();
+        loadTeams(false, false);
     }
 
     @Override
-    public void activateTask(@NonNull Task activeTask) {
-        checkNotNull(activeTask, "activeTask cannot be null!");
-        mTasksRepository.activateTask(activeTask);
-        mTasksView.showTaskMarkedActive();
-        loadTasks(false, false);
+    public void normalTeam(@NonNull Team normalTeam) {
+        checkNotNull(normalTeam, "normalTeam cannot be null!");
+        mTeamsRepository.normalTeam(normalTeam);
+        mTeamsView.showTeamMarkedActive();
+        loadTeams(false, false);
     }
 
     @Override
-    public void clearCompletedTasks() {
-        mTasksRepository.clearCompletedTasks();
-        mTasksView.showCompletedTasksCleared();
-        loadTasks(false, false);
+    public void clearCompletedTeams() {
+        mTeamsRepository.clearChampionTeams();
+        mTeamsView.showCompletedTeamsCleared();
+        loadTeams(false, false);
     }
 
     /**

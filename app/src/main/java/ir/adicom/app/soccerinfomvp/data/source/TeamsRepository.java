@@ -162,9 +162,9 @@ public class TeamsRepository implements TeamsDataSource {
     }
 
     @Override
-    public void clearCompletedTeams() {
-        mTeamsRemoteDataSource.clearCompletedTeams();
-        mTeamsLocalDataSource.clearCompletedTeams();
+    public void clearChampionTeams() {
+        mTeamsRemoteDataSource.clearChampionTeams();
+        mTeamsLocalDataSource.clearChampionTeams();
 
         // Do in memory cache update to keep the app UI up to date
         if (mCachedTeams == null) {
@@ -173,7 +173,7 @@ public class TeamsRepository implements TeamsDataSource {
         Iterator<Map.Entry<String, Team>> it = mCachedTeams.entrySet().iterator();
         while (it.hasNext()) {
             Map.Entry<String, Team> entry = it.next();
-            if (entry.getValue().isCompleted()) {
+            if (entry.getValue().isChampion()) {
                 it.remove();
             }
         }
