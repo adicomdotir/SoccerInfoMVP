@@ -142,7 +142,7 @@ public class TeamsPresenter implements TeamsContract.Presenter {
                 mTeamsView.showActiveFilterLabel();
                 break;
             case TOP_TEAMS:
-                mTeamsView.showCompletedFilterLabel();
+                mTeamsView.showChampionFilterLabel();
                 break;
             default:
                 mTeamsView.showAllFilterLabel();
@@ -156,7 +156,7 @@ public class TeamsPresenter implements TeamsContract.Presenter {
                 mTeamsView.showNoActiveTeams();
                 break;
             case TOP_TEAMS:
-                mTeamsView.showNoCompletedTeams();
+                mTeamsView.showNoChampionTeams();
                 break;
             default:
                 mTeamsView.showNoTeams();
@@ -192,9 +192,9 @@ public class TeamsPresenter implements TeamsContract.Presenter {
     }
 
     @Override
-    public void clearCompletedTeams() {
+    public void clearChampionTeams() {
         mTeamsRepository.clearChampionTeams();
-        mTeamsView.showCompletedTeamsCleared();
+        mTeamsView.showChampionTeamsCleared();
         loadTeams(false, false);
     }
 

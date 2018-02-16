@@ -27,7 +27,7 @@ public interface TeamsContract {
 
         void showTeamMarkedActive();
 
-        void showCompletedTeamsCleared();
+        void showChampionTeamsCleared();
 
         void showLoadingTeamsError();
 
@@ -35,13 +35,13 @@ public interface TeamsContract {
 
         void showActiveFilterLabel();
 
-        void showCompletedFilterLabel();
+        void showChampionFilterLabel();
 
         void showAllFilterLabel();
 
         void showNoActiveTeams();
 
-        void showNoCompletedTeams();
+        void showNoChampionTeams();
 
         void showSuccessfullySavedMessage();
 
@@ -64,7 +64,7 @@ public interface TeamsContract {
 
         void normalTeam(@NonNull Team normalTeam);
 
-        void clearCompletedTeams();
+        void clearChampionTeams();
 
         void setFiltering(TeamsFilterType requestType);
 

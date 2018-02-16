@@ -23,34 +23,33 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import com.example.android.architecture.blueprints.todoapp.R;
-import com.example.android.architecture.blueprints.todoapp.addedittask.AddEditTaskActivity;
-import com.example.android.architecture.blueprints.todoapp.data.Task;
-import com.example.android.architecture.blueprints.todoapp.taskdetail.TaskDetailActivity;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import ir.adicom.app.soccerinfomvp.R;
+import ir.adicom.app.soccerinfomvp.data.Team;
+
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * Display a grid of {@link Task}s. User can choose to view all, active or completed tasks.
+ * Display a grid of {@link Team}s. User can choose to view all, active or champion tasks.
  */
 public class TeamsFragment extends Fragment implements TeamsContract.View {
 
     private TeamsContract.Presenter mPresenter;
 
-    private TasksAdapter mListAdapter;
+    private TeamsAdapter mListAdapter;
 
-    private View mNoTasksView;
+    private View mNoTeamsView;
 
-    private ImageView mNoTaskIcon;
+    private ImageView mNoTeamIcon;
 
-    private TextView mNoTaskMainView;
+    private TextView mNoTeamMainView;
 
-    private TextView mNoTaskAddView;
+    private TextView mNoTeamAddView;
 
-    private LinearLayout mTasksView;
+    private LinearLayout mTeamsView;
 
     private TextView mFilteringLabelView;
 
@@ -65,7 +64,7 @@ public class TeamsFragment extends Fragment implements TeamsContract.View {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mListAdapter = new TasksAdapter(new ArrayList<Task>(0), mItemListener);
+        mListAdapter = new TeamsAdapter(new ArrayList<Team>(0), mItemListener);
     }
 
     @Override
@@ -88,23 +87,23 @@ public class TeamsFragment extends Fragment implements TeamsContract.View {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View root = inflater.inflate(R.layout.tasks_frag, container, false);
+        View root = inflater.inflate(R.layout.teams_frag, container, false);
 
         // Set up tasks view
         ListView listView = (ListView) root.findViewById(R.id.tasks_list);
         listView.setAdapter(mListAdapter);
         mFilteringLabelView = (TextView) root.findViewById(R.id.filteringLabel);
-        mTasksView = (LinearLayout) root.findViewById(R.id.tasksLL);
+        mTeamsView = (LinearLayout) root.findViewById(R.id.tasksLL);
 
         // Set up  no tasks view
-        mNoTasksView = root.findViewById(R.id.noTasks);
-        mNoTaskIcon = (ImageView) root.findViewById(R.id.noTasksIcon);
-        mNoTaskMainView = (TextView) root.findViewById(R.id.noTasksMain);
-        mNoTaskAddView = (TextView) root.findViewById(R.id.noTasksAdd);
-        mNoTaskAddView.setOnClickListener(new View.OnClickListener() {
+        mNoTeamsView = root.findViewById(R.id.noTeams);
+        mNoTeamIcon = (ImageView) root.findViewById(R.id.noTeamsIcon);
+        mNoTeamMainView = (TextView) root.findViewById(R.id.noTeamsMain);
+        mNoTeamAddView = (TextView) root.findViewById(R.id.noTeamsAdd);
+        mNoTeamAddView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                showAddTask();
+                showAddTeam();
             }
         });
 
@@ -112,31 +111,31 @@ public class TeamsFragment extends Fragment implements TeamsContract.View {
         FloatingActionButton fab =
                 (FloatingActionButton) getActivity().findViewById(R.id.fab_add_task);
 
-        fab.setImageResource(R.drawable.ic_add);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mPresenter.addNewTask();
-            }
-        });
+//        fab.setImageResource(R.drawable.ic_add);
+//        fab.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                mPresenter.addNewTeam();
+//            }
+//        });
 
         // Set up progress indicator
-        final ScrollChildSwipeRefreshLayout swipeRefreshLayout =
-                (ScrollChildSwipeRefreshLayout) root.findViewById(R.id.refresh_layout);
-        swipeRefreshLayout.setColorSchemeColors(
-                ContextCompat.getColor(getActivity(), R.color.colorPrimary),
-                ContextCompat.getColor(getActivity(), R.color.colorAccent),
-                ContextCompat.getColor(getActivity(), R.color.colorPrimaryDark)
-        );
-        // Set the scrolling view in the custom SwipeRefreshLayout.
-        swipeRefreshLayout.setScrollUpChild(listView);
-
-        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
-            @Override
-            public void onRefresh() {
-                mPresenter.loadTasks(false);
-            }
-        });
+//        final ScrollChildSwipeRefreshLayout swipeRefreshLayout =
+//                (ScrollChildSwipeRefreshLayout) root.findViewById(R.id.refresh_layout);
+//        swipeRefreshLayout.setColorSchemeColors(
+//                ContextCompat.getColor(getActivity(), R.color.colorPrimary),
+//                ContextCompat.getColor(getActivity(), R.color.colorAccent),
+//                ContextCompat.getColor(getActivity(), R.color.colorPrimaryDark)
+//        );
+//        // Set the scrolling view in the custom SwipeRefreshLayout.
+//        swipeRefreshLayout.setScrollUpChild(listView);
+//
+//        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+//            @Override
+//            public void onRefresh() {
+//                mPresenter.loadTeams(false);
+//            }
+//        });
 
         setHasOptionsMenu(true);
 
@@ -147,13 +146,13 @@ public class TeamsFragment extends Fragment implements TeamsContract.View {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.menu_clear:
-                mPresenter.clearCompletedTasks();
+                mPresenter.clearChampionTeams();
                 break;
             case R.id.menu_filter:
                 showFilteringPopUpMenu();
                 break;
             case R.id.menu_refresh:
-                mPresenter.loadTasks(true);
+                mPresenter.loadTeams(true);
                 break;
         }
         return true;
@@ -173,16 +172,16 @@ public class TeamsFragment extends Fragment implements TeamsContract.View {
             public boolean onMenuItemClick(MenuItem item) {
                 switch (item.getItemId()) {
                     case R.id.active:
-                        mPresenter.setFiltering(TeamsFilterType.ACTIVE_TASKS);
+                        mPresenter.setFiltering(TeamsFilterType.NORMAL_TEAMS);
                         break;
-                    case R.id.completed:
-                        mPresenter.setFiltering(TeamsFilterType.COMPLETED_TASKS);
+                    case R.id.complete:
+                        mPresenter.setFiltering(TeamsFilterType.TOP_TEAMS);
                         break;
                     default:
-                        mPresenter.setFiltering(TeamsFilterType.ALL_TASKS);
+                        mPresenter.setFiltering(TeamsFilterType.ALL_TEAMS);
                         break;
                 }
-                mPresenter.loadTasks(false);
+                mPresenter.loadTeams(false);
                 return true;
             }
         });
@@ -193,20 +192,20 @@ public class TeamsFragment extends Fragment implements TeamsContract.View {
     /**
      * Listener for clicks on tasks in the ListView.
      */
-    TaskItemListener mItemListener = new TaskItemListener() {
+    TeamItemListener mItemListener = new TeamItemListener() {
         @Override
-        public void onTaskClick(Task clickedTask) {
-            mPresenter.openTaskDetails(clickedTask);
+        public void onTeamClick(Team clickedTeam) {
+            mPresenter.openTeamDetails(clickedTeam);
         }
 
         @Override
-        public void onCompleteTaskClick(Task completedTask) {
-            mPresenter.completeTask(completedTask);
+        public void onCompleteTeamClick(Team championTeam) {
+            mPresenter.championTeam(championTeam);
         }
 
         @Override
-        public void onActivateTaskClick(Task activatedTask) {
-            mPresenter.activateTask(activatedTask);
+        public void onNormalTeamClick(Team normalTeam) {
+            mPresenter.normalTeam(normalTeam);
         }
     };
 
@@ -229,16 +228,16 @@ public class TeamsFragment extends Fragment implements TeamsContract.View {
     }
 
     @Override
-    public void showTasks(List<Task> tasks) {
+    public void showTeams(List<Team> tasks) {
         mListAdapter.replaceData(tasks);
 
-        mTasksView.setVisibility(View.VISIBLE);
-        mNoTasksView.setVisibility(View.GONE);
+        mTeamsView.setVisibility(View.VISIBLE);
+        mNoTeamsView.setVisibility(View.GONE);
     }
 
     @Override
-    public void showNoActiveTasks() {
-        showNoTasksViews(
+    public void showNoActiveTeams() {
+        showNoTeamsViews(
                 getResources().getString(R.string.no_tasks_active),
                 R.drawable.ic_check_circle_24dp,
                 false
@@ -246,8 +245,8 @@ public class TeamsFragment extends Fragment implements TeamsContract.View {
     }
 
     @Override
-    public void showNoTasks() {
-        showNoTasksViews(
+    public void showNoTeams() {
+        showNoTeamsViews(
                 getResources().getString(R.string.no_tasks_all),
                 R.drawable.ic_assignment_turned_in_24dp,
                 false
@@ -255,8 +254,8 @@ public class TeamsFragment extends Fragment implements TeamsContract.View {
     }
 
     @Override
-    public void showNoCompletedTasks() {
-        showNoTasksViews(
+    public void showNoChampionTeams() {
+        showNoTeamsViews(
                 getResources().getString(R.string.no_tasks_completed),
                 R.drawable.ic_verified_user_24dp,
                 false
@@ -268,13 +267,13 @@ public class TeamsFragment extends Fragment implements TeamsContract.View {
         showMessage(getString(R.string.successfully_saved_task_message));
     }
 
-    private void showNoTasksViews(String mainText, int iconRes, boolean showAddView) {
-        mTasksView.setVisibility(View.GONE);
-        mNoTasksView.setVisibility(View.VISIBLE);
+    private void showNoTeamsViews(String mainText, int iconRes, boolean showAddView) {
+        mTeamsView.setVisibility(View.GONE);
+        mNoTeamsView.setVisibility(View.VISIBLE);
 
-        mNoTaskMainView.setText(mainText);
-        mNoTaskIcon.setImageDrawable(getResources().getDrawable(iconRes));
-        mNoTaskAddView.setVisibility(showAddView ? View.VISIBLE : View.GONE);
+        mNoTeamMainView.setText(mainText);
+        mNoTeamIcon.setImageDrawable(getResources().getDrawable(iconRes));
+        mNoTeamAddView.setVisibility(showAddView ? View.VISIBLE : View.GONE);
     }
 
     @Override
@@ -283,7 +282,7 @@ public class TeamsFragment extends Fragment implements TeamsContract.View {
     }
 
     @Override
-    public void showCompletedFilterLabel() {
+    public void showChampionFilterLabel() {
         mFilteringLabelView.setText(getResources().getString(R.string.label_completed));
     }
 
@@ -293,37 +292,37 @@ public class TeamsFragment extends Fragment implements TeamsContract.View {
     }
 
     @Override
-    public void showAddTask() {
-        Intent intent = new Intent(getContext(), AddEditTaskActivity.class);
-        startActivityForResult(intent, AddEditTaskActivity.REQUEST_ADD_TASK);
+    public void showAddTeam() {
+//        Intent intent = new Intent(getContext(), AddEditTeamActivity.class);
+//        startActivityForResult(intent, AddEditTeamActivity.REQUEST_ADD_TASK);
     }
 
     @Override
-    public void showTaskDetailsUi(String taskId) {
+    public void showTeamDetailsUi(String taskId) {
         // in it's own Activity, since it makes more sense that way and it gives us the flexibility
         // to show some Intent stubbing.
-        Intent intent = new Intent(getContext(), TaskDetailActivity.class);
-        intent.putExtra(TaskDetailActivity.EXTRA_TASK_ID, taskId);
-        startActivity(intent);
+//        Intent intent = new Intent(getContext(), TeamDetailActivity.class);
+//        intent.putExtra(TeamDetailActivity.EXTRA_TASK_ID, taskId);
+//        startActivity(intent);
     }
 
     @Override
-    public void showTaskMarkedComplete() {
+    public void showTeamMarkedComplete() {
         showMessage(getString(R.string.task_marked_complete));
     }
 
     @Override
-    public void showTaskMarkedActive() {
+    public void showTeamMarkedActive() {
         showMessage(getString(R.string.task_marked_active));
     }
 
     @Override
-    public void showCompletedTasksCleared() {
+    public void showChampionTeamsCleared() {
         showMessage(getString(R.string.completed_tasks_cleared));
     }
 
     @Override
-    public void showLoadingTasksError() {
+    public void showLoadingTeamsError() {
         showMessage(getString(R.string.loading_tasks_error));
     }
 
@@ -336,33 +335,33 @@ public class TeamsFragment extends Fragment implements TeamsContract.View {
         return isAdded();
     }
 
-    private static class TasksAdapter extends BaseAdapter {
+    private static class TeamsAdapter extends BaseAdapter {
 
-        private List<Task> mTasks;
-        private TaskItemListener mItemListener;
+        private List<Team> mTeams;
+        private TeamItemListener mItemListener;
 
-        public TasksAdapter(List<Task> tasks, TaskItemListener itemListener) {
+        public TeamsAdapter(List<Team> tasks, TeamItemListener itemListener) {
             setList(tasks);
             mItemListener = itemListener;
         }
 
-        public void replaceData(List<Task> tasks) {
+        public void replaceData(List<Team> tasks) {
             setList(tasks);
             notifyDataSetChanged();
         }
 
-        private void setList(List<Task> tasks) {
-            mTasks = checkNotNull(tasks);
+        private void setList(List<Team> tasks) {
+            mTeams = checkNotNull(tasks);
         }
 
         @Override
         public int getCount() {
-            return mTasks.size();
+            return mTeams.size();
         }
 
         @Override
-        public Task getItem(int i) {
-            return mTasks.get(i);
+        public Team getItem(int i) {
+            return mTeams.get(i);
         }
 
         @Override
@@ -375,21 +374,21 @@ public class TeamsFragment extends Fragment implements TeamsContract.View {
             View rowView = view;
             if (rowView == null) {
                 LayoutInflater inflater = LayoutInflater.from(viewGroup.getContext());
-                rowView = inflater.inflate(R.layout.task_item, viewGroup, false);
+                rowView = inflater.inflate(R.layout.team_item, viewGroup, false);
             }
 
-            final Task task = getItem(i);
+            final Team task = getItem(i);
 
             TextView titleTV = (TextView) rowView.findViewById(R.id.title);
             titleTV.setText(task.getTitleForList());
 
             CheckBox completeCB = (CheckBox) rowView.findViewById(R.id.complete);
 
-            // Active/completed task UI
-            completeCB.setChecked(task.isCompleted());
-            if (task.isCompleted()) {
+            // Active/champion task UI
+            completeCB.setChecked(task.isChampion());
+            if (task.isChampion()) {
                 rowView.setBackgroundDrawable(viewGroup.getContext()
-                        .getResources().getDrawable(R.drawable.list_completed_touch_feedback));
+                        .getResources().getDrawable(R.drawable.list_champion_touch_feedback));
             } else {
                 rowView.setBackgroundDrawable(viewGroup.getContext()
                         .getResources().getDrawable(R.drawable.touch_feedback));
@@ -398,10 +397,10 @@ public class TeamsFragment extends Fragment implements TeamsContract.View {
             completeCB.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    if (!task.isCompleted()) {
-                        mItemListener.onCompleteTaskClick(task);
+                    if (!task.isChampion()) {
+                        mItemListener.onCompleteTeamClick(task);
                     } else {
-                        mItemListener.onActivateTaskClick(task);
+                        mItemListener.onNormalTeamClick(task);
                     }
                 }
             });
@@ -409,7 +408,7 @@ public class TeamsFragment extends Fragment implements TeamsContract.View {
             rowView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    mItemListener.onTaskClick(task);
+                    mItemListener.onTeamClick(task);
                 }
             });
 
@@ -417,13 +416,13 @@ public class TeamsFragment extends Fragment implements TeamsContract.View {
         }
     }
 
-    public interface TaskItemListener {
+    public interface TeamItemListener {
 
-        void onTaskClick(Task clickedTask);
+        void onTeamClick(Team clickedTeam);
 
-        void onCompleteTaskClick(Task completedTask);
+        void onCompleteTeamClick(Team championTeam);
 
-        void onActivateTaskClick(Task activatedTask);
+        void onNormalTeamClick(Team normalTeam);
     }
 
 }
